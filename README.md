@@ -1,3 +1,3 @@
-# THIS IS RHE BEST MAIL SERVCE EVRE
+# THIS IS ТХЕ BEST MAIL SERVCE EVEREST
 ## yes, this is true
 we would ~~never~~ lie
