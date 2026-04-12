@@ -1,33 +1,27 @@
-from data import db_session
+import requests
 
-from data.users import User
-from data.emails import Email
+import base64
+
+
+def bytes_to_base64(bytes):
+    return base64.b64encode(bytes).decode()
 
 
 def main():
-    db_session.global_init("db/users.db")
-    db_sess = db_session.create_session()
+    with open("test_image.png", "rb") as f:
+        pfp = bytes_to_base64(f.read())
 
-    user1 = User(username="user1", displayname="User 1")
-    user1.set_password("hello")
+    user1 = {"username": "user1", "displayname": "User 1st", "password": "hello"}
+    user2 = {"username": "user2", "displayname": "User 2nd", "password": "goodbye", "pfp": pfp}
 
-    user2 = User(username="user2", displayname="User 2")
-    user2.set_password("goodbye")
+    add_user1 = requests.post("http://127.0.0.1:5000/api/users", json=user1)
+    print(add_user1.json(), add_user1.status_code)
+    add_user2 = requests.post("http://127.0.0.1:5000/api/users", json=user2)
+    print(add_user2.json(), add_user2.status_code)
 
-    db_sess.add(user1)
-    db_sess.add(user2)
-    db_sess.commit()
-
-    sender = db_sess.query(User).filter(User.username == "user1").first()
-    receiver = db_sess.query(User).filter(User.username == "user2").first()
-
-    email = Email()
-    email.sender = sender  # можно email.sender_username
-    email.receiver = receiver  # можно email.receiver_username
-    email.contents = "Hello World!"
-
-    db_sess.add(email)
-    db_sess.commit()
+    user1_put = {"password": "hello", "pfp": pfp}
+    edit_user1 = requests.put("http://127.0.0.1:5000/api/users/user1", json=user1_put)
+    print(edit_user1.json(), edit_user1.status_code)
 
 
 if __name__ == '__main__':
