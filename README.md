@@ -1,3 +1,10 @@
-# THIS IS ТХЕ BEST MAIL SERVCE EVEREST
-## yes, this is true
-we would ~~never~~ lie
+# F-mail
+> F stands for Fig
+
+---
+
+- figs are delicious
+- email is the trendiest communication method
+- we would ~~never~~ lie
+
+![image of some delectable figs](fig.png "Yummers")

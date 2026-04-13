@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, render_template, request
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_restful import Api
 
@@ -21,6 +21,12 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 def main():
     db_session.global_init("db/users.db")
     app.run()
+
+@app.route("/")
+@app.route("/index")
+def index():
+    return render_template("base.html")
+
 
 
 if __name__ == '__main__':

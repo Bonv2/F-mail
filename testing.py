@@ -3,7 +3,7 @@ import requests
 import base64
 
 
-def bytes_to_base64(bytes):
+def bytes_to_base64(bytes) -> str:
     return base64.b64encode(bytes).decode()
 
 
