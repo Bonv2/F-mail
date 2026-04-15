@@ -19,8 +19,17 @@ def main():
     add_user2 = requests.post("http://127.0.0.1:5000/api/users", json=user2)
     print(add_user2.json(), add_user2.status_code)
 
-    user1_put = {"password": "hello", "pfp": pfp}
+    user1_put = {"pfp": pfp}
     edit_user1 = requests.put("http://127.0.0.1:5000/api/users/user1", json=user1_put)
+    print(edit_user1.json(), edit_user1.status_code)
+    print("this was supposed to fail, as we provided no authorization")
+
+    login_request = requests.post("http://127.0.0.1:5000/api/login", json={"username": "user1", "password": "hello"})
+    cookies = login_request.cookies
+    print("we got the session cookies, below is response with them")
+
+    user1_put = {"pfp": pfp}
+    edit_user1 = requests.put("http://127.0.0.1:5000/api/users/user1", json=user1_put, cookies=cookies)
     print(edit_user1.json(), edit_user1.status_code)
 
 

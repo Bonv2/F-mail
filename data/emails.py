@@ -11,7 +11,11 @@ class Email(SqlAlchemyBase, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
+
+    title = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     contents = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    files = sqlalchemy.Column(sqlalchemy.String, nullable=True)  # base64 zip files perhaps?
+
     sender_username = sqlalchemy.Column(sqlalchemy.String,
                                  sqlalchemy.ForeignKey("users.username"))
     receiver_username = sqlalchemy.Column(sqlalchemy.String,

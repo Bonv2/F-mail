@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, redirect
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_restful import Api
 
-from data import users_resource
+from data import users_resource, emails_resource
 from data import db_session
 from data.users import User
 
@@ -13,6 +13,9 @@ api = Api(app)
 api.add_resource(users_resource.UsersListResource, '/api/users')
 api.add_resource(users_resource.UserLoginResource, '/api/login')
 api.add_resource(users_resource.UsersResource, '/api/users/<string:username>')
+
+api.add_resource(emails_resource.EmailsListResource, '/api/emails')
+api.add_resource(emails_resource.EmailsResource, '/api/emails/<int:id>')
 
 SECRET_KEY = os.environ.get('SECRET_KEY') or "DELETE_ME_PLEASE_DONT_RELEASE" # fixme: DELETE
 
