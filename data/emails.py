@@ -12,13 +12,13 @@ class Email(SqlAlchemyBase, SerializerMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
     contents = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    sender_username = sqlalchemy.Column(sqlalchemy.Integer,
+    sender_username = sqlalchemy.Column(sqlalchemy.String,
                                  sqlalchemy.ForeignKey("users.username"))
-    receiver_username = sqlalchemy.Column(sqlalchemy.Integer,
+    receiver_username = sqlalchemy.Column(sqlalchemy.String,
                                sqlalchemy.ForeignKey("users.username"))
 
     sender = orm.relationship("User", foreign_keys=[sender_username], back_populates="outbox")
     receiver = orm.relationship("User", foreign_keys=[receiver_username], back_populates="inbox")
 
     def __repr__(self):
-        return f"<Mail> {self.username} {self.displayname} {self.email}"
+        return f"<Mail> {self.id} {self.sender.username} {self.reciever.username}"

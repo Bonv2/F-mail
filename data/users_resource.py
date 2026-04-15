@@ -1,5 +1,6 @@
+from flask_login import current_user, login_user, logout_user, login_required
 from flask_restful import reqparse, abort, Resource
-from flask import jsonify
+from flask import jsonify, make_response
 from PIL import Image
 import base64
 import os
@@ -16,11 +17,11 @@ add_user_parser.add_argument("pfp", required=False, type=str)
 
 edit_user_parser = reqparse.RequestParser()
 edit_user_parser.add_argument("displayname", required=False)
-edit_user_parser.add_argument("password", required=True)
 edit_user_parser.add_argument("pfp", required=False, type=str)
 
-delete_user_parser = reqparse.RequestParser()
-delete_user_parser.add_argument("password", required=True)
+login_user_parser = reqparse.RequestParser()
+login_user_parser.add_argument("password", required=True)
+login_user_parser.add_argument("username", required=True)
 
 
 def abort_if_user_not_found(username):
@@ -28,6 +29,21 @@ def abort_if_user_not_found(username):
     user = session.query(User).get(username)
     if not user:
         abort(404, message=f"User {username} not found")
+
+
+class UserLoginResource(Resource):
+    def post(self):
+        args = login_user_parser.parse_args()
+        username = args["username"]
+        password = args["password"]
+        db_sess = db_session.create_session()
+        user = db_sess.get(User, username)
+        if not user:
+            abort(404, message=f"Incorrect username or password")
+        if user.check_password(password):
+            login_user(user)
+            return make_response(jsonify({"success": "success, check cookies"}), 200)
+        abort(404, message=f"Incorrect username or password")
 
 
 class UsersResource(Resource):
@@ -46,51 +62,55 @@ class UsersResource(Resource):
             'users': [user_dict]
         })
 
-
+    @login_required
     def put(self, username):
         abort_if_user_not_found(username)
         db_sess = db_session.create_session()
 
         args = edit_user_parser.parse_args()
-        password = args["password"]
-        user = db_sess.get(User, username)
-        if not user.check_password(password):
-            abort(404, message="Incorrect password")
+        cur_user = current_user
+        target_user = db_sess.get(User, username)
+        if cur_user != target_user and cur_user.username != "admin":
+            abort(400, message=f"No permission to edit {target_user.username}, as {cur_user.username}, you can only edit yourself")
         if args["displayname"]:
-            user.displayname = args["displayname"]
+            target_user.displayname = args["displayname"]
         if args["pfp"]:
-            pfp_path = f"db/pfps/{user.username}"
+            pfp_path = f"db/pfps/{target_user.username}"
             if os.path.exists(pfp_path):
-                os.remove(f"db/pfps/{user.username}.jpg")
+                os.remove(f"db/pfps/{target_user.username}.jpg")
             img_data = args['pfp'].encode()
             img = Image.open(BytesIO(base64.b64decode(img_data)))
             img.save(f"db/pfps/{username}.jpg", format="JPEG")
-            user.pfp = f"{username}.jpg"
+            target_user.pfp = f"{username}.jpg"
 
         db_sess.commit()
         return jsonify({"success": "OK"})
 
-
+    @login_required
     def delete(self, username):
         abort_if_user_not_found(username)
-        args = delete_user_parser.parse_args()
 
         session = db_session.create_session()
-        user = session.get(User, username)
-        if not user.check_password(args["password"]):
-            abort(404, message="Incorrect password")
+        cur_user = current_user
+        target_user = session.get(User, username)
+        if cur_user != target_user and cur_user.username != "admin":
+            abort(400, message=f"No permission to delete {target_user.username}, as {cur_user.username}, you can only delete yourself")
 
-        if user.pfp:
-            os.remove(f"db/pfps/{user.username}.jpg")
+        if target_user.pfp:
+            os.remove(f"db/pfps/{target_user.username}.jpg")
 
-        session.delete(user)
+        session.delete(target_user)
         session.commit()
         return jsonify({"success": "OK"})
 
 
 class UsersListResource(Resource):
     def get(self):
-        ...
+        session = db_session.create_session()
+        users = session.query(User).all()
+        return jsonify({
+            'users': [user.to_dict(only=('username', 'displayname')) for user in users]
+        })
 
     def post(self):
         args = add_user_parser.parse_args()
