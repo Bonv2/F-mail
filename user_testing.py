@@ -15,9 +15,15 @@ def main():
     user2 = {"username": "user2", "displayname": "User 2nd", "password": "goodbye", "pfp": pfp}
 
     add_user1 = requests.post("http://127.0.0.1:5000/api/users", json=user1)
-    print(add_user1.json(), add_user1.status_code)
+    try:
+        print(add_user1.json(), add_user1.status_code)
+    except Exception:
+        pass
     add_user2 = requests.post("http://127.0.0.1:5000/api/users", json=user2)
-    print(add_user2.json(), add_user2.status_code)
+    try:
+        print(add_user2.json(), add_user2.status_code)
+    except Exception:
+        pass
 
     user1_put = {"pfp": pfp}
     edit_user1 = requests.put("http://127.0.0.1:5000/api/users/user1", json=user1_put)
