@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2 class="mb-4">Входящие</h2>
+
+<div class="list-group">
+
+    {% for mail in mails %}
+    <a href="/mail/{{ mail.id }}" class="list-group-item list-group-item-action">
+
+        <div class="d-flex justify-content-between">
+            <strong>{{ mail.sender_username }}</strong>
+        </div>
+
+        <div>{{ mail.title }}</div>
+
+    </a>
+    {% endfor %}
+
+</div>
+{% endblock %}

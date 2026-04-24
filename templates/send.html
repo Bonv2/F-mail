@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Новое письмо</h2>
+
+<form method="post">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+        {{ form.to.label(class="form-label") }}
+        {{ form.to(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.subject.label(class="form-label") }}
+        {{ form.subject(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.body.label(class="form-label") }}
+        {{ form.body(class="form-control") }}
+    </div>
+
+    <button class="btn btn-primary">Отправить</button>
+</form>
+{% endblock %}
