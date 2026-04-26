@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_restful import Api
 
@@ -61,35 +61,71 @@ def send():
     form = SendForm()
 
     if form.validate_on_submit():
-        try:
-            send_email({
-                "receiver_username": form.to.data,
-                "title": form.subject.data,
-                "contents": form.body.data
-            })
-            return redirect('/inbox')
+        db_sess = db_session.create_session()
 
-        except Exception as e:
-            return render_template('send.html', form=form, message=str(e))
+        receiver = db_sess.get(User, form.to.data)
+        if not receiver:
+            return render_template('send.html', form=form, message="Пользователь не найден")
+
+        email = Email(
+            sender=current_user,
+            receiver=receiver,
+            title=form.subject.data,
+            contents=form.body.data
+        )
+
+        db_sess.add(email)
+        db_sess.commit()
+
+        return redirect('/inbox')
 
     return render_template('send.html', form=form)
+
+from flask import request
 
 @app.route('/inbox')
 @login_required
 def inbox():
-    data = get_emails()
-    return render_template("inbox.html", mails=data['emails'])
+    db_sess = db_session.create_session()
+
+    query = request.args.get("q", "").lower()
+
+    mails = db_sess.query(Email).filter(
+        Email.receiver_username == current_user.username
+    ).all()
+
+    if query:
+        mails = [
+            m for m in mails
+            if query in (m.title or "").lower()
+               or query in (m.contents or "").lower()
+               or query in (m.sender_username or "").lower()
+        ]
+
+    read_mails = session.get("read_mails", [])
+
+    return render_template(
+        "inbox.html",
+        mails=mails,
+        read_mails=read_mails,
+        search=query
+    )
+
+from flask import session
 
 @app.route('/mail/<int:id>')
 @login_required
 def mail(id):
     db_sess = db_session.create_session()
-
     mail = db_sess.get(Email, id)
 
-    # защита (очень важно)
     if mail.receiver_username != current_user.username and mail.sender_username != current_user.username:
         return "Нет доступа", 403
+
+    read_mails = session.get("read_mails", [])
+    if id not in read_mails:
+        read_mails.append(id)
+        session["read_mails"] = read_mails
 
     return render_template("mail.html", mail=mail)
 
@@ -97,9 +133,12 @@ def mail(id):
 @login_required
 def sent():
     db_sess = db_session.create_session()
-    user = db_sess.get(User, current_user.username)
 
-    return render_template("sent.html", mails=user.outbox)
+    mails = db_sess.query(Email).filter(
+        Email.sender_username == current_user.username
+    ).all()
+
+    return render_template("sent.html", mails=mails)
 
 from forms.register_form import RegisterForm
 from flask import flash
@@ -156,7 +195,7 @@ def login():
 
 def main():
     db_session.global_init("db/users.db")
-    app.run()
+    app.run(debug=True)
 
 
 if __name__ == '__main__':

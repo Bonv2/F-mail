@@ -1,21 +1,30 @@
-{% extends "layout.html" %}
-
-{% block content %}
-<h2 class="mb-4">Входящие</h2>
-
-<div class="list-group">
+<div class="list-group list-group-flush" id="mailList">
 
     {% for mail in mails %}
-    <a href="/mail/{{ mail.id }}" class="list-group-item list-group-item-action">
+    <a href="/mail/{{ mail.id }}"
+       class="list-group-item list-group-item-action mail-item 
+       {% if mail.id not in read_mails %}fw-bold bg-light{% endif %}"
+
+       data-sender="{{ mail.sender_username }}"
+       data-title="{{ mail.title }}"
+       data-content="{{ mail.contents or '' }}">
 
         <div class="d-flex justify-content-between">
-            <strong>{{ mail.sender_username }}</strong>
+            <span>
+                {% if mail.id not in read_mails %}
+                    🟢
+                {% endif %}
+                {{ mail.sender_username }}
+            </span>
+
+            <small class="text-muted">#{{ mail.id }}</small>
         </div>
 
-        <div>{{ mail.title }}</div>
+        <div class="text-truncate">
+            {{ mail.title }}
+        </div>
 
     </a>
     {% endfor %}
 
 </div>
-{% endblock %}

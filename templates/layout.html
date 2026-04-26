@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Mail{% endblock %}</title>
+    <title>{% block title %}F-mail{% endblock %}</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -13,17 +13,49 @@
     <div class="row vh-100">
 
         <!-- Sidebar -->
-        <div class="col-2 bg-dark text-white p-3">
-            <h4>📧 F-mail</h4>
+        <div class="col-md-2 bg-dark text-white p-3">
 
-            <a href="/inbox" class="d-block text-white mb-2">📥 Входящие</a>
-            <a href="/send" class="d-block text-white mb-2">✍️ Написать</a>
-            <a href="/logout" class="d-block text-danger mt-3">🚪 Выйти</a>
+            <h4 class="mb-4">📧 F-mail</h4>
+
+            <a href="/send" class="btn btn-primary w-100 mb-3">
+                ✍️ Написать
+            </a>
+
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a href="/inbox" class="nav-link text-white">📥 Входящие</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/sent" class="nav-link text-white">📤 Отправленные</a>
+                </li>
+                <li class="nav-item mt-3">
+                    <a href="/logout" class="nav-link text-danger">🚪 Выйти</a>
+                </li>
+            </ul>
+
         </div>
 
-        <!-- Content -->
-        <div class="col-10 p-4 overflow-auto">
+        <!-- Main -->
+        <div class="col-md-10 p-3">
+
+            <!-- Topbar -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <form method="get" action="/inbox" class="w-50">
+    <input
+        type="text"
+        name="q"
+        value="{{ search or '' }}"
+        class="form-control"
+        placeholder="🔍 Поиск писем..."
+    >
+</form>
+                <div>
+                    👤 {{ current_user.displayname }}
+                </div>
+            </div>
+
             {% block content %}{% endblock %}
+
         </div>
 
     </div>

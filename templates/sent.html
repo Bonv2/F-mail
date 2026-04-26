@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="card shadow-sm">
+
+    <div class="card-header bg-white">
+        <b>Отправленные</b>
+    </div>
+
+    <div class="list-group list-group-flush">
+
+        {% for mail in mails %}
+        <a href="/mail/{{ mail.id }}" class="list-group-item list-group-item-action">
+
+            <div class="d-flex justify-content-between">
+                <strong>→ {{ mail.receiver_username }}</strong>
+                <small class="text-muted">#{{ mail.id }}</small>
+            </div>
+
+            <div class="text-truncate">
+                {{ mail.title }}
+            </div>
+
+        </a>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}
