@@ -4,11 +4,14 @@
 
 <div class="row">
 
+    <!-- Левая панель -->
     <div class="col-md-3">
         <div class="card shadow-sm border-0">
             <div class="card-body">
 
-                <h5 class="mb-3">Меню</h5>
+                <h5 class="mb-3">
+                    Меню
+                </h5>
 
                 <div class="d-grid gap-2">
 
@@ -33,6 +36,7 @@
         </div>
     </div>
 
+    <!-- Правая часть -->
     <div class="col-md-9">
 
         <div class="card shadow-sm border-0">
@@ -63,6 +67,9 @@
 
                             <p>
                                 {{ (email.contents or "")[:120] }}
+                                {% if email.contents and email.contents|length > 120 %}
+                                    ...
+                                {% endif %}
                             </p>
 
                             <a href="/email/{{ email.id }}"

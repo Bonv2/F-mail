@@ -3,16 +3,16 @@
 {% block content %}
 
 <div class="row justify-content-center">
-    <div class="col-md-7 col-lg-6">
+    <div class="col-lg-6">
 
         <div class="card shadow-sm border-0">
             <div class="card-body p-5">
 
-                <h2 class="text-center mb-4">
+                <h2 class="mb-4 text-center">
                     Регистрация
                 </h2>
 
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
 
                     {{ form.hidden_tag() }}
 
@@ -24,6 +24,11 @@
                     <div class="mb-3">
                         {{ form.displayname.label(class="form-label") }}
                         {{ form.displayname(class="form-control") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.pfp.label(class="form-label") }}
+                        {{ form.pfp(class="form-control") }}
                     </div>
 
                     <div class="mb-3">
@@ -41,12 +46,8 @@
                         {{ form.login_after.label(class="form-check-label") }}
                     </div>
 
-                    <div class="d-grid gap-2">
+                    <div class="d-grid">
                         {{ form.submit(class="btn btn-success") }}
-
-                        <a href="/" class="btn btn-outline-secondary">
-                            Назад
-                        </a>
                     </div>
 
                 </form>

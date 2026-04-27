@@ -9,12 +9,12 @@
             {{ email.title }}
         </h2>
 
-        <p>
+        <p class="mb-2">
             <strong>От:</strong>
             {{ email.sender_username }}
         </p>
 
-        <p>
+        <p class="mb-4">
             <strong>Кому:</strong>
             {{ email.receiver_username }}
         </p>
@@ -22,7 +22,7 @@
         <hr>
 
         <div class="mb-4" style="white-space: pre-line;">
-            {{ email.contents }}
+            {{ email.contents or "" }}
         </div>
 
         <a href="/compose?receiver={{ email.sender_username }}&title={{ email.title }}"

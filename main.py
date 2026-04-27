@@ -1,18 +1,17 @@
 import os
 
-from flask import Flask, render_template, redirect, flash, request
+from flask import Flask, render_template, redirect, flash, request, send_from_directory
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_restful import Api
-
-from forms.compose_form import ComposeForm
-from data.emails import Email
 
 from data import users_resource, emails_resource
 from data import db_session
 from data.users import User
+from data.emails import Email
 
 from forms.login_form import LoginForm
 from forms.register_form import RegisterForm
+from forms.compose_form import ComposeForm
 
 
 app = Flask(__name__)
@@ -28,13 +27,13 @@ api.add_resource(users_resource.UsersResource, '/api/users/<string:username>')
 api.add_resource(emails_resource.EmailsListResource, '/api/emails')
 api.add_resource(emails_resource.EmailsResource, '/api/emails/<int:id>')
 
-
 # ---------------- CONFIG ---------------- #
 
 SECRET_KEY = os.environ.get("SECRET_KEY") or "DELETE_ME_PLEASE_DONT_RELEASE"
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY not set")
 
 app.config["SECRET_KEY"] = SECRET_KEY
-
 
 # ---------------- LOGIN MANAGER ---------------- #
 
@@ -48,6 +47,12 @@ def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.get(User, user_id)
 
+
+# ---------------- PFP ---------------- #
+
+@app.route("/pfp/<path:filename>")
+def user_pfp(filename):
+    return send_from_directory("db/pfps", filename)
 
 # ---------------- WEB ROUTES ---------------- #
 
@@ -68,25 +73,16 @@ def login():
 
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-
         user = db_sess.get(User, form.username.data)
 
         if not user or not user.check_password(form.password.data):
             flash("Неверный логин или пароль")
-            return render_template(
-                "login.html",
-                title="Вход",
-                form=form
-            )
+            return render_template("login.html", title="Вход", form=form)
 
         login_user(user, remember=form.remember_me.data)
         return redirect("/mailbox")
 
-    return render_template(
-        "login.html",
-        title="Вход",
-        form=form
-    )
+    return render_template("login.html", title="Вход", form=form)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -121,6 +117,15 @@ def register():
         )
         user.set_password(form.password.data)
 
+        if form.pfp.data:
+            import os
+
+            filename = f"{form.username.data}.jpg"
+            save_path = os.path.join("db", "pfps", filename)
+
+            form.pfp.data.save(save_path)
+            user.pfp = filename
+
         db_sess.add(user)
         db_sess.commit()
 
@@ -131,18 +136,13 @@ def register():
         flash("Аккаунт успешно создан")
         return redirect("/login")
 
-    return render_template(
-        "register.html",
-        title="Регистрация",
-        form=form
-    )
+    return render_template("register.html", title="Регистрация", form=form)
 
 
 @app.route("/mailbox")
 @login_required
 def mailbox():
     db_sess = db_session.create_session()
-
     mail_type = request.args.get("type", "inbox")
 
     if mail_type == "outbox":
@@ -162,11 +162,11 @@ def mailbox():
         mail_type=mail_type
     )
 
+
 @app.route("/email/<int:email_id>")
 @login_required
 def email_view(email_id):
     db_sess = db_session.create_session()
-
     email = db_sess.get(Email, email_id)
 
     if not email:
@@ -187,6 +187,7 @@ def email_view(email_id):
         email=email
     )
 
+
 @app.route("/compose", methods=["GET", "POST"])
 @login_required
 def compose():
@@ -195,35 +196,28 @@ def compose():
     receiver = request.args.get("receiver")
     title = request.args.get("title")
 
-    if receiver:
+    if receiver and request.method == "GET":
         form.receiver_username.data = receiver
 
-    if title:
+    if title and request.method == "GET":
         form.title.data = f"RE: {title}"
 
     if form.validate_on_submit():
         db_sess = db_session.create_session()
 
         target_user = db_sess.get(User, form.receiver_username.data)
+        sender_user = db_sess.get(User, current_user.username)
 
         if not target_user:
             flash("Получатель не найден")
-            return render_template(
-                "compose.html",
-                title="Новое письмо",
-                form=form
-            )
+            return render_template("compose.html", title="Новое письмо", form=form)
 
-        if target_user.username == current_user.username:
+        if target_user.username == sender_user.username:
             flash("Нельзя отправить письмо самому себе")
-            return render_template(
-                "compose.html",
-                title="Новое письмо",
-                form=form
-            )
+            return render_template("compose.html", title="Новое письмо", form=form)
 
         email = Email(
-            sender=current_user,
+            sender=sender_user,
             receiver=target_user,
             title=form.title.data,
             contents=form.contents.data
@@ -235,11 +229,8 @@ def compose():
         flash("Письмо отправлено")
         return redirect("/mailbox")
 
-    return render_template(
-        "compose.html",
-        title="Новое письмо",
-        form=form
-    )
+    return render_template("compose.html", title="Новое письмо", form=form)
+
 
 @app.route("/logout")
 @login_required
@@ -247,8 +238,6 @@ def logout():
     logout_user()
     return redirect("/")
 
-
-# ---------------- MAIN ---------------- #
 
 def main():
     db_session.global_init("db/users.db")
