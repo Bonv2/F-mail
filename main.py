@@ -12,6 +12,7 @@ app = Flask(__name__)
 api = Api(app)
 api.add_resource(users_resource.UsersListResource, '/api/users')
 api.add_resource(users_resource.UserLoginResource, '/api/login')
+api.add_resource(users_resource.UserThisOneResource, '/api/this_user')
 api.add_resource(users_resource.UsersResource, '/api/users/<string:username>')
 
 api.add_resource(emails_resource.EmailsListResource, '/api/emails')

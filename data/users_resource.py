@@ -41,7 +41,7 @@ def get_one_user(username):
     user = session.get(User, username)
     user_dict = user.to_dict(only=('username', 'displayname'))
     try:
-        with open(user.pfp, "rb") as f:
+        with open(f"db/pfps/{user.pfp}", "rb") as f:
             pfp = f.read()
         user_dict["pfp"] = base64.b64encode(pfp).decode()
     except Exception as e:
@@ -132,6 +132,12 @@ class UserLoginResource(Resource):
             return make_response(jsonify(login_user_api(username, password)), 200)
         except Exception as e:
             abort(404, message=e)
+
+
+class UserThisOneResource(Resource):
+    @login_required
+    def get(self):
+        return get_one_user(current_user.username)
 
 
 class UsersResource(Resource):
