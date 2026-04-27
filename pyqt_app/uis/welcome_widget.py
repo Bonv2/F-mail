@@ -22,8 +22,11 @@ class WelcomeWidget(QWidget, Ui_Form):
         self.close()
 
     def post_show(self):
-        with open("do_not_share.json", "r") as file:
-            data = json.load(file)
+        try:
+            with open("do_not_share.json", "r") as file:
+                data = json.load(file)
+        except Exception:
+            return
         try:
             session = data["sc"]
         except KeyError:

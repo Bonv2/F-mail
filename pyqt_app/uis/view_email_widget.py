@@ -18,7 +18,7 @@ class ViewEmailWidget(QWidget, Ui_Form):
         self.initUI()
 
     def answer(self):
-        self.answer_widget = EditEmailWidget(self.session, reciever=self.data["receiver_username"], title=self.data["title"],
+        self.answer_widget = EditEmailWidget(self.session, reciever=self.data["sender_username"], title=self.data["title"],
                                              parent=self.parent_w)
         self.answer_widget.show()
         self.close()

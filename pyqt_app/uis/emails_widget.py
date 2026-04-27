@@ -95,7 +95,7 @@ class EmailsWidget(QMainWindow, Ui_MainWindow):
                 widgt = EmailSingleWidget(self.session, email, self)
                 self.scrollAreaWidgetContents.layout().addWidget(widgt)
                 self.emails.append(widgt)
-            if self.opened_mail == "sent" and email["sender_username"] == self.user_info["username"]:
+            elif self.opened_mail == "sent" and email["sender_username"] == self.user_info["username"]:
                 widgt = EmailSingleWidget(self.session, email, self)
                 self.scrollAreaWidgetContents.layout().addWidget(widgt)
                 self.emails.append(widgt)

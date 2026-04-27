@@ -27,7 +27,7 @@ class EmailSingleWidget(QWidget, Ui_Form):
         self.answer_button.clicked.connect(self.answer)
 
     def answer(self):
-        self.answer_widget = EditEmailWidget(self.session, reciever=self.data["receiver_username"],
+        self.answer_widget = EditEmailWidget(self.session, reciever=self.data["sender_username"],
                                              title=self.data["title"],
                                              parent=self.parent_w)
         self.answer_widget.show()

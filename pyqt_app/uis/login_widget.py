@@ -60,8 +60,11 @@ class LoginWidget(QWidget, Ui_Form):
             retval = msg.exec()
             return
 
-        with open("do_not_share.json", "r") as file:
-            data = json.load(file)
+        try:
+            with open("do_not_share.json", "r") as file:
+                data = json.load(file)
+        except Exception:
+            data = {}
         data["sc"] = request.cookies.get_dict()["session"]
         with open("do_not_share.json", "w") as file:
             json.dump(data, file)
