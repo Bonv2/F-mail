@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+
+                <h5 class="mb-3">Меню</h5>
+
+                <div class="d-grid gap-2">
+
+                    <a href="/mailbox?type=inbox"
+                       class="btn {% if mail_type == 'inbox' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        Полученная
+                    </a>
+
+                    <a href="/mailbox?type=outbox"
+                       class="btn {% if mail_type == 'outbox' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        Отправленная
+                    </a>
+
+                    <a href="/compose"
+                       class="btn btn-success mt-3">
+                        Написать
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+
+                <h4 class="mb-4">
+                    {% if mail_type == "inbox" %}
+                        Входящие письма
+                    {% else %}
+                        Отправленные письма
+                    {% endif %}
+                </h4>
+
+                {% if emails %}
+
+                    {% for email in emails %}
+                        <div class="border rounded p-3 mb-3">
+
+                            <h5>{{ email.title }}</h5>
+
+                            <p class="text-muted mb-2">
+                                {% if mail_type == "inbox" %}
+                                    От: {{ email.sender_username }}
+                                {% else %}
+                                    Кому: {{ email.receiver_username }}
+                                {% endif %}
+                            </p>
+
+                            <p>
+                                {{ (email.contents or "")[:120] }}
+                            </p>
+
+                            <a href="/email/{{ email.id }}"
+                               class="btn btn-sm btn-outline-dark">
+                                Открыть
+                            </a>
+
+                        </div>
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="alert alert-light border">
+                        Писем пока нет
+                    </div>
+
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-5">
+
+                <h2 class="text-center mb-4">
+                    Регистрация
+                </h2>
+
+                <form method="post">
+
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.username.label(class="form-label") }}
+                        {{ form.username(class="form-control") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.displayname.label(class="form-label") }}
+                        {{ form.displayname(class="form-control") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.password_again.label(class="form-label") }}
+                        {{ form.password_again(class="form-control") }}
+                    </div>
+
+                    <div class="form-check mb-4">
+                        {{ form.login_after(class="form-check-input") }}
+                        {{ form.login_after.label(class="form-check-label") }}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-success") }}
+
+                        <a href="/" class="btn btn-outline-secondary">
+                            Назад
+                        </a>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
