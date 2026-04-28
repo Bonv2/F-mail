@@ -56,7 +56,7 @@ class RegisterWidget(QWidget, Ui_Form):
         username = self.username_edit.text()
         displayname = self.displayname_edit.text()
         password = self.password_edit.text()
-        password_again =  self.password_again_edit.text()
+        password_again = self.password_again_edit.text()
         if not username.strip() or not password.strip() or not displayname.strip():
             self.do_error("Missing password or username", "Error")
             return
@@ -86,7 +86,7 @@ class RegisterWidget(QWidget, Ui_Form):
 
         if request.status_code != 200:
             msg = QMessageBox()
-            msg.setText("Username already in use")
+            msg.setText(f"error! {request.status_code}")
             retval = msg.exec()
             return
 
@@ -99,9 +99,11 @@ class RegisterWidget(QWidget, Ui_Form):
             msg.setWindowTitle("Error")
             retval = msg.exec()
             return
-
-        with open("do_not_share.json", "r") as file:
-            data = json.load(file)
+        try:
+            with open("do_not_share.json", "r") as file:
+                data = json.load(file)
+        except Exception as e:
+            data = {}
         data["sc"] = request.cookies.get_dict()["session"]
         with open("do_not_share.json", "w") as file:
             json.dump(data, file)
