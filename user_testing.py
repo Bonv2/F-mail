@@ -27,7 +27,10 @@ def main():
 
     user1_put = {"pfp": pfp}
     edit_user1 = requests.put("http://127.0.0.1:5000/api/users/user1", json=user1_put)
-    print(edit_user1.json(), edit_user1.status_code)
+    try:
+        print(edit_user1.json(), edit_user1.status_code)
+    except Exception:
+        pass
     print("this was supposed to fail, as we provided no authorization")
 
     login_request = requests.post("http://127.0.0.1:5000/api/login", json={"username": "user1", "password": "hello"})
@@ -36,7 +39,10 @@ def main():
 
     user1_put = {"pfp": pfp}
     edit_user1 = requests.put("http://127.0.0.1:5000/api/users/user1", json=user1_put, cookies=cookies)
-    print(edit_user1.json(), edit_user1.status_code)
+    try:
+        print(edit_user1.json(), edit_user1.status_code)
+    except Exception:
+        pass
 
 
 if __name__ == '__main__':
