@@ -46,8 +46,11 @@ class RegisterWidget(QWidget, Ui_Form):
         fname = QFileDialog.getOpenFileName(
             self, 'Выбрать картинку', '',
             'Картинка (*.jpg);;Картинка (*.png);;Все файлы (*)')[0]
-        with open(fname, "rb") as f:
-            self.pfp = bytes_to_base64(f.read())
+        try:
+            with open(fname, "rb") as f:
+                self.pfp = bytes_to_base64(f.read())
+        except Exception:
+            return
 
     def attempt_register(self, event):
         username = self.username_edit.text()

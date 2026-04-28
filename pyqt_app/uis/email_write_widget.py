@@ -28,7 +28,7 @@ class EditEmailWidget(QWidget, Ui_Form):
             self.title_edit.setText(f"RE: {self.title}")
 
         this_user = requests.get(self.url + "api/this_user", cookies={"session": self.session}).json()["users"][0]
-        self.sender_label.setText(f"{this_user["username"]} (Вы)")
+        self.sender_label.setText(f"{this_user['username']} (Вы)")
 
         self.send_button.clicked.connect(self.send)
 
